@@ -78,6 +78,78 @@ var _colors2 = _interopRequireDefault(_colors);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var matched = void 0;
+var colorToPost = void 0;
+
+// Iteration 1
+var getTopColor = function getTopColor() {
+  fetch('https://color-swatch-api.herokuapp.com/api/v1/top_color').then(function (response) {
+    return response.json();
+  }).then(function (color) {
+    $('.top-color').append(color.value + ', count: ' + color.color_count);
+  });
+};
+
+//Iteration2
+//assume a user posts words separated by spaces. Check the words to see if there is a color that matches the COLORS library. Then post a swatch of that color.
+// so, on button click, take the info from the textarea
+//Each color swatch should have a background color of its text's correlating hex code,
+// e.g., "red" => `<div class="swatch" style="background-color:#FF0000;"></div>`
+
+$('button').on("click", function (event) {
+  formIntake();
+});
+
+$(document).keypress(function (event) {
+  if (event.which === 13) {
+    formIntake();
+  }
+});
+
+var formIntake = function formIntake() {
+  event.preventDefault();
+  var possibleMatches = Array.from($('textarea').val()).join('').split(' ');
+  var matched = possibleMatches.reduce(function (newObj, elem) {
+    if (_colors2.default[elem]) {
+      newObj[elem] = _colors2.default[elem];
+      postColors(elem);
+    } else if (_colors2.default[elem.toLowerCase()]) {
+      postColors(elem);
+    }
+
+    return newObj;
+  }, {});
+  Object.keys(matched).forEach(function (key) {
+    $('.colorized-text').append('\n      <div class="swatch" style="background-color:' + matched[key] + ';"></div>\n      ');
+  });
+};
+
+// story 3 post the colors to the heroku database:
+
+//make an object like color: {value: array[i]}
+
+var colorsToPost = function colorsToPost(key) {
+  return colorToPost = {
+    color: {
+      value: key
+    }
+  };
+};
+
+var postColors = function postColors(key) {
+  fetch('https://color-swatch-api.herokuapp.com/api/v1/colors', {
+    method: "POST",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(colorsToPost(key))
+  }).then(function (response) {
+    return response.json();
+  }).then(function (parsedResponse) {
+    return console.log(parsedResponse);
+  });
+};
+
+var postData = getTopColor();
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
