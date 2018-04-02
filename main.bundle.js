@@ -109,16 +109,27 @@ $(document).keypress(function (event) {
 var formIntake = function formIntake() {
   event.preventDefault();
   var possibleMatches = Array.from($('textarea').val()).join('').split(' ');
+  console.log(possibleMatches);
   var matched = possibleMatches.reduce(function (newObj, elem) {
+    if (elem.includes(",")) {
+      elem = elem.slice(0, -1);
+    } else if (elem.includes(".")) {
+      elem = elem.slice(0, -1);
+    } else {
+      elem;
+    }
+
     if (_colors2.default[elem]) {
+      console.log("line 44", elem);
+      console.log("line 45", newObj);
       newObj[elem] = _colors2.default[elem];
       postColors(elem);
     } else if (_colors2.default[elem.toLowerCase()]) {
       postColors(elem);
     }
-
     return newObj;
   }, {});
+  console.log("matched: ", matched);
   Object.keys(matched).forEach(function (key) {
     $('.colorized-text').append('\n      <div class="swatch" style="background-color:' + matched[key] + ';"></div>\n      ');
   });
